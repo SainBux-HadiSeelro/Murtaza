@@ -5,7 +5,7 @@ import QRCode from 'qrcode';
 import { fetchEntries, updateEntryStatus, togglePhotoVisibility, deleteEntry } from '@/lib/api';
 import type { EventType, GuestEntry, StatusType } from '@/lib/types';
 
-const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD ?? 'wedding2024';
+const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'hadi&admin12';
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 const POLL_INTERVAL = 5000; // refresh every 5 seconds
 

@@ -8,7 +8,7 @@ interface Props { event: EventType; }
 
 const SLIDE_DURATION = 5000;  // 5 seconds per slide
 const POLL_INTERVAL  = 6000;  // ms between refreshes
-const SLIDESHOW_PASSWORD = 'murtazaslideshow12';
+const SLIDESHOW_PASSWORD = process.env.NEXT_PUBLIC_SLIDESHOW_PASSWORD || 'murtazaslideshow12';
 
 const EVENT_CONFIG = {
   shadi: {
