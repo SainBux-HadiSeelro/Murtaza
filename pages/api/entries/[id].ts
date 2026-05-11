@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { supabaseAdmin } from '@/lib/supabase-admin';
+import { supabase } from '@/lib/supabase';
 
 function rowToEntry(row: Record<string, unknown>) {
   return {
@@ -18,7 +18,7 @@ function rowToEntry(row: Record<string, unknown>) {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query as { id: string };
 
-  // ── PATCH — update status / showPhoto ──────────────────────────────────────
+  // ── PATCH ──────────────────────────────────────────────────────────────────
   if (req.method === 'PATCH') {
     const body = req.body as Record<string, unknown>;
     const patch: Record<string, unknown> = {};
@@ -28,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (Object.keys(patch).length === 0)
       return res.status(400).json({ error: 'Nothing to update' });
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('guest_entries')
       .update(patch)
       .eq('id', id)
@@ -40,9 +40,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json(rowToEntry(data));
   }
 
-  // ── DELETE — permanently remove (uses service role to bypass RLS) ──────────
+  // ── DELETE ─────────────────────────────────────────────────────────────────
   if (req.method === 'DELETE') {
-    const { error } = await supabaseAdmin
+    const { error } = await supabase
       .from('guest_entries')
       .delete()
       .eq('id', id);

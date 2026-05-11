@@ -1,12 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { supabaseAdmin as supabase } from '@/lib/supabase-admin';
+import { supabase } from '@/lib/supabase';
 import type { EventType } from '@/lib/types';
 
 export const config = {
   api: { bodyParser: { sizeLimit: '15mb' } },
 };
 
-// ─── Map DB row → GuestEntry ──────────────────────────────────────────────────
 function rowToEntry(row: Record<string, unknown>) {
   return {
     id:        row.id,
@@ -37,14 +36,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const { data, error } = await query;
     if (error) return res.status(500).json({ error: error.message });
-
     return res.status(200).json((data ?? []).map(rowToEntry));
   }
 
   // ── POST ───────────────────────────────────────────────────────────────────
   if (req.method === 'POST') {
-    const { name, phone, message, photoUrl, event } = req.body as {
-      name: string; phone: string; message: string;
+    const { name, message, photoUrl, event } = req.body as {
+      name: string; message: string;
       photoUrl: string | null; event: EventType;
     };
 
@@ -62,19 +60,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       .from('guest_entries')
       .insert({
         id,
-        name:      name.trim(),
-        phone:     '',
-        message:   message.trim(),
-        photo_url: photoUrl ?? null,
+        name:       name.trim(),
+        phone:      '',
+        message:    message.trim(),
+        photo_url:  photoUrl ?? null,
         event,
-        status:    'pending',
+        status:     'pending',
         show_photo: true,
-        timestamp: Date.now(),
+        timestamp:  Date.now(),
       })
       .select()
       .single();
 
-    if (error) return res.status(500).json({ error: error.message });
+    if (error) {
+      console.error('Supabase insert error:', error);
+      return res.status(500).json({ error: error.message });
+    }
     return res.status(201).json(rowToEntry(data));
   }
 
