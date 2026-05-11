@@ -1,0 +1,30 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /guestEntries/{entryId} {
+      // Anyone can create a new entry (guests submitting forms)
+      allow create: if
+        request.resource.data.keys().hasAll(['name', 'phone', 'message', 'event', 'status', 'showPhoto', 'timestamp']) &&
+        request.resource.data.event in ['shadi', 'walima'] &&
+        request.resource.data.status == 'pending' &&
+        request.resource.data.name is string &&
+        request.resource.data.name.size() > 0 &&
+        request.resource.data.phone is string &&
+        request.resource.data.message is string &&
+        request.resource.data.message.size() > 0;
+
+      // Anyone can read (needed for slideshow + admin)
+      // In production, restrict admin reads with Firebase Auth
+      allow read: if true;
+
+      // Only allow updates to status and showPhoto fields
+      // (admin actions — in production, protect with Firebase Auth)
+      allow update: if
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['status', 'showPhoto', 'photoUrl']);
+
+      // No deletes from client
+      allow delete: if false;
+    }
+  }
+}
