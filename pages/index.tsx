@@ -55,7 +55,9 @@ export default function Home() {
     return (
       <>
         <Head><title>Thank You — Murtaza & Family</title></Head>
-        <div className="bg-wedding-form flex items-center justify-center p-6 min-h-screen">
+        <div className="flex items-center justify-center p-6 min-h-screen" style={{
+          background: 'linear-gradient(135deg, #0a1f14 0%, #1a3a2a 25%, #2d5a3d 50%, #1a3a2a 75%, #0a1f14 100%)',
+        }}>
           <div className="glass-card p-10 max-w-md w-full text-center animate-fade-in">
             <div className="text-7xl mb-6 float-anim">🎊</div>
             <h2 className="text-3xl font-bold text-gold-shimmer mb-3" style={{ fontFamily: 'Playfair Display, serif' }}>
@@ -80,10 +82,81 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
       </Head>
 
-      <div className="bg-wedding-form flex items-center justify-center p-4 py-8 min-h-screen">
-        {/* Decorative blobs */}
-        <div className="fixed top-0 left-0 w-72 h-72 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="fixed bottom-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="flex items-center justify-center p-4 py-8 min-h-screen" style={{
+        background: 'linear-gradient(160deg, #071a0f 0%, #0d2b1a 30%, #1a4a2e 55%, #0d2b1a 75%, #071a0f 100%)',
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+
+        {/* ── Animated CSS background ── */}
+        <style>{`
+          @keyframes petalFallForm {
+            0%   { transform: translateY(-40px) rotate(0deg);   opacity: 0; }
+            10%  { opacity: 0.7; }
+            90%  { opacity: 0.4; }
+            100% { transform: translateY(105vh) rotate(540deg); opacity: 0; }
+          }
+          @keyframes bokehPulse {
+            0%, 100% { transform: scale(1);    opacity: 0.06; }
+            50%       { transform: scale(1.15); opacity: 0.13; }
+          }
+          @keyframes floatForm {
+            0%, 100% { transform: translateY(0px); }
+            50%       { transform: translateY(-10px); }
+          }
+        `}</style>
+
+        {/* Bokeh circles */}
+        {[
+          { left:'5%',  top:'10%', size:'180px', dur:'7s',  delay:'0s'   },
+          { left:'80%', top:'8%',  size:'220px', dur:'9s',  delay:'1s'   },
+          { left:'15%', top:'65%', size:'150px', dur:'6s',  delay:'2s'   },
+          { left:'70%', top:'60%', size:'200px', dur:'8s',  delay:'0.5s' },
+          { left:'45%', top:'30%', size:'130px', dur:'10s', delay:'1.5s' },
+        ].map((b, i) => (
+          <div key={i} style={{
+            position: 'fixed', left: b.left, top: b.top,
+            width: b.size, height: b.size, borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(74,163,100,0.5), transparent)',
+            filter: 'blur(30px)',
+            animation: `bokehPulse ${b.dur} ease-in-out ${b.delay} infinite`,
+            pointerEvents: 'none', zIndex: 0,
+          }} />
+        ))}
+
+        {/* Falling petals */}
+        {[
+          { left:'5%',  dur:'8s',  delay:'0s',   size:'1.2rem', emoji:'🌿' },
+          { left:'15%', dur:'11s', delay:'1.5s', size:'0.9rem', emoji:'🍃' },
+          { left:'28%', dur:'7s',  delay:'0.5s', size:'1.1rem', emoji:'🌿' },
+          { left:'42%', dur:'9s',  delay:'2s',   size:'0.8rem', emoji:'🍃' },
+          { left:'55%', dur:'8s',  delay:'0.8s', size:'1rem',   emoji:'🌿' },
+          { left:'68%', dur:'10s', delay:'1.2s', size:'1.2rem', emoji:'🍃' },
+          { left:'80%', dur:'7s',  delay:'0.3s', size:'0.9rem', emoji:'🌿' },
+          { left:'92%', dur:'9s',  delay:'1.8s', size:'1rem',   emoji:'🍃' },
+          { left:'35%', dur:'12s', delay:'3s',   size:'0.8rem', emoji:'🌿' },
+          { left:'72%', dur:'8s',  delay:'2.5s', size:'1.1rem', emoji:'🍃' },
+        ].map((p, i) => (
+          <div key={i} style={{
+            position: 'fixed', left: p.left, top: '-2rem',
+            fontSize: p.size, opacity: 0.5,
+            animation: `petalFallForm ${p.dur} linear ${p.delay} infinite`,
+            pointerEvents: 'none', zIndex: 0,
+          }}>{p.emoji}</div>
+        ))}
+
+        {/* Subtle gold shimmer line top */}
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, height: '2px',
+          background: 'linear-gradient(to right, transparent, rgba(134,197,143,0.6), rgba(212,175,55,0.4), rgba(134,197,143,0.6), transparent)',
+          zIndex: 1, pointerEvents: 'none',
+        }} />
+        {/* Subtle shimmer line bottom */}
+        <div style={{
+          position: 'fixed', bottom: 0, left: 0, right: 0, height: '2px',
+          background: 'linear-gradient(to right, transparent, rgba(134,197,143,0.6), rgba(212,175,55,0.4), rgba(134,197,143,0.6), transparent)',
+          zIndex: 1, pointerEvents: 'none',
+        }} />
 
         {/* ── Corner Menu (top-right) ── */}
         <div className="fixed top-4 right-4 z-50">
