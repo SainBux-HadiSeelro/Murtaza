@@ -17,7 +17,7 @@ const EVENT_CONFIG = {
     emoji: '🌸',
     accentColor: '#fda4af',
     secondaryColor: '#fcd34d',
-    bg: 'linear-gradient(160deg, #2a1f0a 0%, #3d2e10 35%, #4a3818 65%, #2e2208 100%)',
+    bg: 'linear-gradient(160deg, #1a0000 0%, #3d0000 35%, #5c0000 65%, #2a0000 100%)',
   },
   walima: {
     title: 'Walima Mubarak',
@@ -25,7 +25,7 @@ const EVENT_CONFIG = {
     emoji: '🌹',
     accentColor: '#fcd34d',
     secondaryColor: '#fda4af',
-    bg: 'linear-gradient(160deg, #2a1f0a 0%, #3d2e10 35%, #4a3818 65%, #2e2208 100%)',
+    bg: 'linear-gradient(160deg, #1a0000 0%, #3d0000 35%, #5c0000 65%, #2a0000 100%)',
   },
 };
 
