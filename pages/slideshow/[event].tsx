@@ -17,7 +17,7 @@ const EVENT_CONFIG = {
     emoji: '🌸',
     accentColor: '#fda4af',
     secondaryColor: '#fcd34d',
-    bg: 'radial-gradient(ellipse at top, #2d0a1e 0%, #1a0a2e 40%, #0d0d1a 100%)',
+    bg: 'linear-gradient(160deg, #2a1f0a 0%, #3d2e10 35%, #4a3818 65%, #2e2208 100%)',
   },
   walima: {
     title: 'Walima Mubarak',
@@ -25,7 +25,7 @@ const EVENT_CONFIG = {
     emoji: '🌹',
     accentColor: '#fcd34d',
     secondaryColor: '#fda4af',
-    bg: 'radial-gradient(ellipse at top, #1a0a00 0%, #1a0a2e 40%, #0d0d1a 100%)',
+    bg: 'linear-gradient(160deg, #2a1f0a 0%, #3d2e10 35%, #4a3818 65%, #2e2208 100%)',
   },
 };
 
@@ -375,16 +375,18 @@ export default function SlideshowPage({ event }: Props) {
 
       <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', background: cfg.bg }}>
 
-        {/* Glow blobs */}
+        {/* Glow blobs — subtle warm on charcoal */}
         <div style={{
-          position: 'absolute', top: 0, left: '25%',
-          width: '384px', height: '384px', borderRadius: '50%',
-          background: cfg.accentColor, filter: 'blur(80px)', opacity: 0.15, pointerEvents: 'none',
+          position: 'absolute', top: '10%', left: '20%',
+          width: '350px', height: '350px', borderRadius: '50%',
+          background: `radial-gradient(circle, ${cfg.accentColor}18, transparent)`,
+          filter: 'blur(60px)', pointerEvents: 'none',
         }} />
         <div style={{
-          position: 'absolute', bottom: 0, right: '25%',
-          width: '384px', height: '384px', borderRadius: '50%',
-          background: cfg.secondaryColor, filter: 'blur(80px)', opacity: 0.12, pointerEvents: 'none',
+          position: 'absolute', bottom: '10%', right: '20%',
+          width: '300px', height: '300px', borderRadius: '50%',
+          background: `radial-gradient(circle, ${cfg.secondaryColor}12, transparent)`,
+          filter: 'blur(60px)', pointerEvents: 'none',
         }} />
 
         {/* ── Floating Rose Petals ── */}
