@@ -7,7 +7,7 @@ import type { EventType, GuestEntry } from '@/lib/types';
 interface Props { event: EventType; }
 
 const SLIDE_DURATION = 5000;  // 5 seconds per slide
-const POLL_INTERVAL  = 6000;  // ms between refreshes
+const POLL_INTERVAL  = 15000; // 15s — less network calls = faster
 const SLIDESHOW_PASSWORD = process.env.NEXT_PUBLIC_SLIDESHOW_PASSWORD || 'murtazaslideshow12';
 
 const EVENT_CONFIG = {
@@ -335,38 +335,26 @@ export default function SlideshowPage({ event }: Props) {
             50%       { transform: translateY(-8px); }
           }
           @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50%       { transform: translateY(-12px) rotate(3deg); }
-          }
-          @keyframes floatCouple {
-            0%, 100% { transform: translateY(0px) scale(1); }
-            50%       { transform: translateY(-18px) scale(1.04); }
-          }
-          @keyframes floatHeart {
-            0%, 100% { transform: translateY(0px) scale(1) rotate(-5deg); }
-            50%       { transform: translateY(-22px) scale(1.15) rotate(5deg); }
+            0%, 100% { transform: translateY(0px); }
+            50%       { transform: translateY(-10px); }
           }
           @keyframes glowPulse {
-            0%, 100% { opacity: 0.18; transform: scale(1); }
-            50%       { opacity: 0.32; transform: scale(1.12); }
-          }
-          @keyframes rotateSlow {
-            from { transform: rotate(0deg); }
-            to   { transform: rotate(360deg); }
+            0%, 100% { opacity: 0.08; }
+            50%       { opacity: 0.18; }
           }
           @keyframes progressFill {
             from { transform: scaleX(0); }
             to   { transform: scaleX(1); }
           }
           @keyframes twinkle {
-            0%, 100% { opacity: 0.2; transform: scale(0.8); }
-            50%       { opacity: 1;   transform: scale(1.2); }
+            0%, 100% { opacity: 0.15; }
+            50%       { opacity: 0.7; }
           }
           @keyframes petalFall {
-            0%   { transform: translateY(-60px) rotate(0deg);   opacity: 0;   }
-            10%  { opacity: 0.6; }
-            90%  { opacity: 0.4; }
-            100% { transform: translateY(110vh) rotate(720deg); opacity: 0;   }
+            0%   { transform: translateY(-40px) rotate(0deg);   opacity: 0; }
+            10%  { opacity: 0.5; }
+            90%  { opacity: 0.3; }
+            100% { transform: translateY(105vh) rotate(540deg); opacity: 0; }
           }
           * { margin: 0; padding: 0; box-sizing: border-box; }
           body { overflow: hidden; background: #0d0d1a; }
@@ -389,72 +377,47 @@ export default function SlideshowPage({ event }: Props) {
           filter: 'blur(60px)', pointerEvents: 'none',
         }} />
 
-        {/* ── Floating Rose Petals ── */}
+        {/* ── 5 Petals only (was 12) ── */}
         {[
-          { left:'8%',  animDur:'7s',  delay:'0s',   size:'2rem',  emoji:'🌸' },
-          { left:'18%', animDur:'9s',  delay:'1.5s', size:'1.4rem',emoji:'🌹' },
-          { left:'30%', animDur:'6s',  delay:'0.8s', size:'1.8rem',emoji:'🌸' },
-          { left:'45%', animDur:'11s', delay:'2s',   size:'1.2rem',emoji:'🌺' },
-          { left:'58%', animDur:'8s',  delay:'0.3s', size:'2rem',  emoji:'🌸' },
-          { left:'70%', animDur:'7s',  delay:'1.2s', size:'1.5rem',emoji:'🌹' },
-          { left:'82%', animDur:'10s', delay:'0.6s', size:'1.8rem',emoji:'🌸' },
-          { left:'92%', animDur:'6s',  delay:'1.8s', size:'1.3rem',emoji:'🌺' },
-          { left:'25%', animDur:'8s',  delay:'3s',   size:'1.1rem',emoji:'🌸' },
-          { left:'65%', animDur:'9s',  delay:'2.5s', size:'1.6rem',emoji:'🌹' },
-          { left:'50%', animDur:'7s',  delay:'4s',   size:'1.2rem',emoji:'🌸' },
-          { left:'38%', animDur:'11s', delay:'1s',   size:'1.4rem',emoji:'🌺' },
+          { left:'8%',  animDur:'8s',  delay:'0s',   size:'1.8rem', emoji:'🌸' },
+          { left:'28%', animDur:'10s', delay:'1.5s', size:'1.4rem', emoji:'🌹' },
+          { left:'55%', animDur:'9s',  delay:'0.8s', size:'1.6rem', emoji:'🌸' },
+          { left:'72%', animDur:'7s',  delay:'2s',   size:'1.3rem', emoji:'🌺' },
+          { left:'90%', animDur:'11s', delay:'0.4s', size:'1.5rem', emoji:'🌸' },
         ].map((p, i) => (
           <div key={i} style={{
-            position: 'absolute',
-            left: p.left,
-            top: '-3rem',
-            fontSize: p.size,
-            opacity: 0.55,
+            position: 'absolute', left: p.left, top: '-3rem',
+            fontSize: p.size, opacity: 0.5,
             animation: `petalFall ${p.animDur} linear ${p.delay} infinite`,
             pointerEvents: 'none',
-            filter: 'blur(0.3px)',
           }}>{p.emoji}</div>
         ))}
 
-        {/* ── Bokeh Gold Circles ── */}
+        {/* ── 3 Bokeh circles (was 7) ── */}
         {[
-          { left:'5%',  top:'15%', size:'80px',  opacity:0.07, dur:'6s',  delay:'0s'   },
-          { left:'88%', top:'10%', size:'120px', opacity:0.06, dur:'8s',  delay:'1s'   },
-          { left:'15%', top:'60%', size:'60px',  opacity:0.08, dur:'5s',  delay:'2s'   },
-          { left:'75%', top:'55%', size:'90px',  opacity:0.07, dur:'7s',  delay:'0.5s' },
-          { left:'45%', top:'5%',  size:'70px',  opacity:0.06, dur:'9s',  delay:'1.5s' },
-          { left:'60%', top:'75%', size:'100px', opacity:0.05, dur:'6s',  delay:'3s'   },
-          { left:'30%', top:'80%', size:'55px',  opacity:0.08, dur:'7s',  delay:'2.5s' },
+          { left:'5%',  top:'15%', size:'100px', opacity:0.08, dur:'7s', delay:'0s'   },
+          { left:'80%', top:'10%', size:'130px', opacity:0.06, dur:'9s', delay:'1s'   },
+          { left:'45%', top:'70%', size:'80px',  opacity:0.07, dur:'6s', delay:'2s'   },
         ].map((b, i) => (
           <div key={i} style={{
-            position: 'absolute',
-            left: b.left, top: b.top,
-            width: b.size, height: b.size,
-            borderRadius: '50%',
+            position: 'absolute', left: b.left, top: b.top,
+            width: b.size, height: b.size, borderRadius: '50%',
             background: `radial-gradient(circle, ${cfg.accentColor}, transparent)`,
             opacity: b.opacity,
             animation: `glowPulse ${b.dur} ease-in-out ${b.delay} infinite`,
-            pointerEvents: 'none',
-            filter: 'blur(8px)',
+            pointerEvents: 'none', filter: 'blur(10px)',
           }} />
         ))}
 
-        {/* ── Twinkling Stars ── */}
+        {/* ── 3 Stars (was 7) ── */}
         {[
           { left:'10%', top:'20%', delay:'0s'   },
-          { left:'85%', top:'25%', delay:'0.7s' },
-          { left:'20%', top:'70%', delay:'1.4s' },
-          { left:'78%', top:'65%', delay:'0.3s' },
-          { left:'50%', top:'15%', delay:'1s'   },
-          { left:'35%', top:'45%', delay:'2s'   },
-          { left:'65%', top:'40%', delay:'1.7s' },
+          { left:'85%', top:'25%', delay:'0.8s' },
+          { left:'50%', top:'12%', delay:'1.5s' },
         ].map((s, i) => (
           <div key={i} style={{
-            position: 'absolute',
-            left: s.left, top: s.top,
-            fontSize: '0.6rem',
-            color: cfg.accentColor,
-            opacity: 0.6,
+            position: 'absolute', left: s.left, top: s.top,
+            fontSize: '0.6rem', color: cfg.accentColor, opacity: 0.5,
             animation: `twinkle 3s ease-in-out ${s.delay} infinite`,
             pointerEvents: 'none',
           }}>★</div>

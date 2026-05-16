@@ -6,6 +6,22 @@ export const config = {
   api: { bodyParser: { sizeLimit: '15mb' } },
 };
 
+// List view — NO photo_url (too large, loaded separately on demand)
+function rowToEntryList(row: Record<string, unknown>) {
+  return {
+    id:        row.id,
+    name:      row.name,
+    phone:     row.phone,
+    message:   row.message,
+    photoUrl:  row.photo_url ? '__has_photo__' : null, // just a flag
+    event:     row.event,
+    status:    row.status,
+    showPhoto: row.show_photo,
+    timestamp: row.timestamp,
+  };
+}
+
+// Full entry — includes photo_url (used for slideshow + single fetch)
 function rowToEntry(row: Record<string, unknown>) {
   return {
     id:        row.id,
@@ -24,11 +40,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   // ── GET ────────────────────────────────────────────────────────────────────
   if (req.method === 'GET') {
-    const { event, status } = req.query;
+    const { event, status, full } = req.query;
+
+    // ?full=1 → include photo_url (slideshow uses this)
+    const selectFields = full === '1'
+      ? '*'
+      : 'id,name,phone,message,photo_url,event,status,show_photo,timestamp';
 
     let query = supabase
       .from('guest_entries')
-      .select('*')
+      .select(selectFields)
       .order('timestamp', { ascending: false });
 
     if (event)  query = query.eq('event', event as string);
@@ -36,7 +57,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const { data, error } = await query;
     if (error) return res.status(500).json({ error: error.message });
-    return res.status(200).json((data ?? []).map(rowToEntry));
+
+    const mapper = full === '1' ? rowToEntry : rowToEntryList;
+    return res.status(200).json((data ?? []).map(mapper));
   }
 
   // ── POST ───────────────────────────────────────────────────────────────────

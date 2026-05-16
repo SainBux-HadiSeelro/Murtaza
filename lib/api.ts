@@ -1,10 +1,5 @@
-/**
- * Client-side API helpers — replaces Firebase calls entirely.
- * Data is stored in data/guests.json on the server.
- */
 import type { EventType, GuestEntry, StatusType } from './types';
 
-// ─── Convert File to base64 data URL ─────────────────────────────────────────
 function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -14,7 +9,6 @@ function fileToBase64(file: File): Promise<string> {
   });
 }
 
-// ─── Submit a new guest entry ─────────────────────────────────────────────────
 export async function addGuestEntry(data: {
   name: string;
   phone: string;
@@ -23,7 +17,6 @@ export async function addGuestEntry(data: {
   event: EventType;
 }): Promise<GuestEntry> {
   let photoUrl: string | null = null;
-
   if (data.photoFile) {
     photoUrl = await fileToBase64(data.photoFile);
   }
@@ -44,25 +37,31 @@ export async function addGuestEntry(data: {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error ?? 'Failed to submit');
   }
-
   return res.json();
 }
 
-// ─── Fetch all entries for an event (admin) ───────────────────────────────────
+// Admin list — fast, no photos
 export async function fetchEntries(event: EventType): Promise<GuestEntry[]> {
   const res = await fetch(`/api/entries?event=${event}`);
   if (!res.ok) throw new Error('Failed to fetch entries');
   return res.json();
 }
 
-// ─── Fetch approved entries for slideshow ────────────────────────────────────
+// Slideshow — needs full photos
 export async function fetchApprovedEntries(event: EventType): Promise<GuestEntry[]> {
-  const res = await fetch(`/api/entries?event=${event}&status=approved`);
+  const res = await fetch(`/api/entries?event=${event}&status=approved&full=1`);
   if (!res.ok) throw new Error('Failed to fetch entries');
   return res.json();
 }
 
-// ─── Update entry status ──────────────────────────────────────────────────────
+// Fetch single photo on demand (admin preview)
+export async function fetchEntryPhoto(id: string): Promise<string | null> {
+  const res = await fetch(`/api/entries/photo/${id}`);
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data.photoUrl ?? null;
+}
+
 export async function updateEntryStatus(id: string, status: StatusType): Promise<GuestEntry> {
   const res = await fetch(`/api/entries/${id}`, {
     method: 'PATCH',
@@ -73,7 +72,6 @@ export async function updateEntryStatus(id: string, status: StatusType): Promise
   return res.json();
 }
 
-// ─── Toggle photo visibility ──────────────────────────────────────────────────
 export async function togglePhotoVisibility(id: string, showPhoto: boolean): Promise<GuestEntry> {
   const res = await fetch(`/api/entries/${id}`, {
     method: 'PATCH',
@@ -84,10 +82,7 @@ export async function togglePhotoVisibility(id: string, showPhoto: boolean): Pro
   return res.json();
 }
 
-// ─── Delete entry permanently ─────────────────────────────────────────────────
 export async function deleteEntry(id: string): Promise<void> {
-  const res = await fetch(`/api/entries/${id}`, {
-    method: 'DELETE',
-  });
+  const res = await fetch(`/api/entries/${id}`, { method: 'DELETE' });
   if (!res.ok) throw new Error('Failed to delete entry');
 }

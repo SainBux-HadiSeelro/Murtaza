@@ -3,6 +3,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
 import { addGuestEntry } from '@/lib/api';
+import { compressImage } from '@/lib/imageUtils';
 
 type FormState = 'idle' | 'submitting' | 'success' | 'error';
 
