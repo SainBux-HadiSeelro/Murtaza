@@ -52,7 +52,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
 // ─── QR Code Modal ────────────────────────────────────────────────────────────
 function QRModal({ event, onClose }: { event: EventType; onClose: () => void }) {
   const [qrDataUrl, setQrDataUrl] = useState('');
-  const url = `${APP_URL}/form/${event}`;
+  const url = 'https://sainbux.online';
 
   useEffect(() => {
     QRCode.toDataURL(url, {
