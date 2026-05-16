@@ -6,7 +6,7 @@ import { fetchEntries, updateEntryStatus, togglePhotoVisibility, deleteEntry } f
 import type { EventType, GuestEntry, StatusType } from '@/lib/types';
 
 const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'hadi&admin12';
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://sainbux.online';
 const POLL_INTERVAL = 5000; // refresh every 5 seconds
 
 // ─── Login Screen ─────────────────────────────────────────────────────────────
