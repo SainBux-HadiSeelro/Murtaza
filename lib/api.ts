@@ -50,10 +50,9 @@ export async function fetchEntries(event: EventType): Promise<GuestEntry[]> {
   return res.json();
 }
 
-// Slideshow — fetches metadata only (no base64 photos) to avoid 507 errors.
-// Photos are loaded one-at-a-time via fetchSlidePhoto().
+// Slideshow — with full=1 to get Cloudinary photo URLs (URLs are tiny, not base64)
 export async function fetchApprovedEntries(event: EventType): Promise<GuestEntry[]> {
-  const res = await fetch(`/api/entries?event=${event}&status=approved`);
+  const res = await fetch(`/api/entries?event=${event}&status=approved&full=1`);
   if (!res.ok) throw new Error('Failed to fetch entries');
   return res.json();
 }

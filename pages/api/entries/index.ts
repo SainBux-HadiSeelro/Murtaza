@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { sql } from '@/lib/db-neon';
+import { supabase } from '@/lib/supabase';
 import { uploadBase64Photo } from '@/lib/cloudinary';
 import type { EventType } from '@/lib/types';
 
@@ -11,7 +11,7 @@ function rowToEntry(row: Record<string, unknown>, includePhoto = true) {
   return {
     id:                row.id,
     name:              row.name,
-    phone:             row.phone,
+    phone:             row.phone ?? '',
     message:           row.message,
     photoUrl:          includePhoto
       ? (row.photo_url ?? null)
@@ -33,43 +33,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const includePhoto = full === '1';
 
     try {
-      let rows;
-      if (event && status) {
-        // Slideshow: approved entries with photo URLs (URLs are tiny, not base64)
-        rows = await sql`
-          SELECT id, name, phone, message, photo_url, event, status, show_photo,
-                 timestamp, original_photo_kb, compressed_photo_kb
-          FROM guest_entries
-          WHERE event = ${event as string} AND status = ${status as string}
-          ORDER BY timestamp ASC
-          LIMIT 100
-        `;
-      } else if (event) {
-        // Admin list: no photo data at all
-        rows = await sql`
-          SELECT id, name, phone, message,
-            CASE WHEN photo_url IS NOT NULL THEN '__has_photo__' ELSE NULL END AS photo_url,
-            event, status, show_photo, timestamp, original_photo_kb, compressed_photo_kb
-          FROM guest_entries
-          WHERE event = ${event as string}
-          ORDER BY timestamp DESC
-        `;
+      let query = supabase
+        .from('guest_entries')
+        .select('id,name,phone,message,photo_url,event,status,show_photo,timestamp,original_photo_kb,compressed_photo_kb');
+
+      if (event)  query = query.eq('event', event as string);
+      if (status) query = query.eq('status', status as string);
+
+      if (status === 'approved') {
+        query = query.order('timestamp', { ascending: true }).limit(100);
       } else {
-        rows = await sql`
-          SELECT id, name, phone, message,
-            CASE WHEN photo_url IS NOT NULL THEN '__has_photo__' ELSE NULL END AS photo_url,
-            event, status, show_photo, timestamp, original_photo_kb, compressed_photo_kb
-          FROM guest_entries
-          ORDER BY timestamp DESC
-        `;
+        query = query.order('timestamp', { ascending: false });
       }
 
+      const { data, error } = await query;
+      if (error) return res.status(500).json({ error: error.message });
+
       return res.status(200).json(
-        rows.map((r) => rowToEntry(r as Record<string, unknown>, includePhoto))
+        (data ?? []).map((r) => rowToEntry(r as Record<string, unknown>, includePhoto))
       );
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : 'Database error';
-      console.error('GET error:', msg);
       return res.status(500).json({ error: msg });
     }
   }
@@ -89,37 +73,42 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 
-    // Upload photo to Cloudinary if provided (base64 → URL)
+    // Upload photo to Cloudinary if base64
     let finalPhotoUrl: string | null = null;
     if (photoUrl && photoUrl.startsWith('data:')) {
       try {
         finalPhotoUrl = await uploadBase64Photo(photoUrl, id);
       } catch (e) {
         console.error('Cloudinary upload error:', e);
-        // Continue without photo rather than failing the whole submission
         finalPhotoUrl = null;
       }
     } else if (photoUrl) {
-      finalPhotoUrl = photoUrl; // already a URL
+      finalPhotoUrl = photoUrl;
     }
 
-    try {
-      const rows = await sql`
-        INSERT INTO guest_entries
-          (id, name, phone, message, photo_url, event, status, show_photo,
-           timestamp, original_photo_kb, compressed_photo_kb)
-        VALUES
-          (${id}, ${name.trim()}, '', ${message.trim()}, ${finalPhotoUrl},
-           ${event}, 'pending', true, ${Date.now()},
-           ${originalPhotoKB ?? null}, ${compressedPhotoKB ?? null})
-        RETURNING *
-      `;
-      return res.status(201).json(rowToEntry(rows[0] as Record<string, unknown>, true));
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : 'Database error';
-      console.error('POST error:', msg);
-      return res.status(500).json({ error: msg });
+    const { data, error } = await supabase
+      .from('guest_entries')
+      .insert({
+        id,
+        name:                name.trim(),
+        phone:               '',
+        message:             message.trim(),
+        photo_url:           finalPhotoUrl,
+        event,
+        status:              'pending',
+        show_photo:          true,
+        timestamp:           Date.now(),
+        original_photo_kb:   originalPhotoKB ?? null,
+        compressed_photo_kb: compressedPhotoKB ?? null,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Supabase insert error:', error.message);
+      return res.status(500).json({ error: error.message });
     }
+    return res.status(201).json(rowToEntry(data as Record<string, unknown>, true));
   }
 
   res.setHeader('Allow', ['GET', 'POST']);

@@ -1,17 +1,19 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { sql } from '@/lib/db-neon';
+import { supabase } from '@/lib/supabase';
 
 function rowToEntry(row: Record<string, unknown>) {
   return {
-    id:        row.id,
-    name:      row.name,
-    phone:     row.phone,
-    message:   row.message,
-    photoUrl:  row.photo_url ?? null,
-    event:     row.event,
-    status:    row.status,
-    showPhoto: row.show_photo,
-    timestamp: Number(row.timestamp),
+    id:                row.id,
+    name:              row.name,
+    phone:             row.phone ?? '',
+    message:           row.message,
+    photoUrl:          row.photo_url ?? null,
+    event:             row.event,
+    status:            row.status,
+    showPhoto:         row.show_photo,
+    timestamp:         Number(row.timestamp),
+    originalPhotoKB:   row.original_photo_kb   != null ? Number(row.original_photo_kb)   : null,
+    compressedPhotoKB: row.compressed_photo_kb != null ? Number(row.compressed_photo_kb) : null,
   };
 }
 
@@ -21,45 +23,34 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // ── PATCH ──────────────────────────────────────────────────────────────────
   if (req.method === 'PATCH') {
     const body = req.body as Record<string, unknown>;
+    const patch: Record<string, unknown> = {};
+    if ('status'    in body) patch['status']     = body.status;
+    if ('showPhoto' in body) patch['show_photo'] = body.showPhoto;
 
-    try {
-      let rows;
-      if ('status' in body && 'showPhoto' in body) {
-        rows = await sql`
-          UPDATE guest_entries SET status = ${body.status as string}, show_photo = ${body.showPhoto as boolean}
-          WHERE id = ${id} RETURNING *
-        `;
-      } else if ('status' in body) {
-        rows = await sql`
-          UPDATE guest_entries SET status = ${body.status as string}
-          WHERE id = ${id} RETURNING *
-        `;
-      } else if ('showPhoto' in body) {
-        rows = await sql`
-          UPDATE guest_entries SET show_photo = ${body.showPhoto as boolean}
-          WHERE id = ${id} RETURNING *
-        `;
-      } else {
-        return res.status(400).json({ error: 'Nothing to update' });
-      }
+    if (Object.keys(patch).length === 0)
+      return res.status(400).json({ error: 'Nothing to update' });
 
-      if (!rows.length) return res.status(404).json({ error: 'Entry not found' });
-      return res.status(200).json(rowToEntry(rows[0] as Record<string, unknown>));
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : 'Database error';
-      return res.status(500).json({ error: msg });
-    }
+    const { data, error } = await supabase
+      .from('guest_entries')
+      .update(patch)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) return res.status(500).json({ error: error.message });
+    if (!data)  return res.status(404).json({ error: 'Not found' });
+    return res.status(200).json(rowToEntry(data as Record<string, unknown>));
   }
 
   // ── DELETE ─────────────────────────────────────────────────────────────────
   if (req.method === 'DELETE') {
-    try {
-      await sql`DELETE FROM guest_entries WHERE id = ${id}`;
-      return res.status(200).json({ success: true });
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : 'Database error';
-      return res.status(500).json({ error: msg });
-    }
+    const { error } = await supabase
+      .from('guest_entries')
+      .delete()
+      .eq('id', id);
+
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ success: true });
   }
 
   res.setHeader('Allow', ['PATCH', 'DELETE']);

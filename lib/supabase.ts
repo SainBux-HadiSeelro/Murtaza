@@ -1,12 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Use env vars if available, fallback to hardcoded values for Vercel
-const supabaseUrl =
-  process.env.NEXT_PUBLIC_SUPABASE_URL ||
-  'https://qgpnzdhapyxdfzsbylwp.supabase.co';
-
-const supabaseKey =
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  'sb_publishable_V_5Jybi0Zf7hIsZ5ps_mZQ_zLz3WzU0';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ysmccfszlutetlathgpo.supabase.co';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_y3rk5z-Itrz0JO4V4s-eVQ_WGauRCFA';
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
