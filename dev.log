@@ -388,3 +388,4 @@ GET error: Server error (HTTP status 402): {"message":"Your project has exceeded
    Reload env: .env.local
  ○ Compiling /api/entries ...
  ✓ Compiled /api/entries in 708ms (73 modules)
+ GET /api/entries?event=shadi 200 in 1295ms
