@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
-import { fetchApprovedEntries, fetchSlidePhoto } from '@/lib/api';
+import { fetchApprovedEntries } from '@/lib/api';
 import type { EventType, GuestEntry } from '@/lib/types';
 
 interface Props { event: EventType; }
@@ -260,12 +260,9 @@ export default function SlideshowPage({ event }: Props) {
   const [progressKey, setProgressKey]   = useState(0);
 
   // Keep latest entries count in a ref so timer always sees fresh value
-  const entriesRef   = useRef<GuestEntry[]>([]);
-  const slideTimer   = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const pollTimer    = useRef<ReturnType<typeof setInterval> | null>(null);
-  // Cache loaded photos by slide index to avoid re-fetching
-  const [photoCache, setPhotoCache] = useState<Record<number, string | null>>({});
-  const loadingRef = useRef<Set<number>>(new Set());
+  const entriesRef = useRef<GuestEntry[]>([]);
+  const slideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pollTimer  = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Auth check on mount
   useEffect(() => {
@@ -315,35 +312,6 @@ export default function SlideshowPage({ event }: Props) {
       setProgressKey((k) => k + 1);
     }
   }, [entries.length, currentIndex]);
-
-  // Lazy-load the current slide's photo (and pre-load next slide's photo)
-  useEffect(() => {
-    if (entries.length === 0) return;
-    const loadPhoto = async (idx: number) => {
-      if (loadingRef.current.has(idx) || photoCache[idx] !== undefined) return;
-      const entry = entries[idx];
-      if (!entry) return;
-      // Only load if the entry has a photo marker
-      if (entry.photoUrl !== '__has_photo__') {
-        setPhotoCache((c) => ({ ...c, [idx]: null }));
-        return;
-      }
-      loadingRef.current.add(idx);
-      const full = await fetchSlidePhoto(event, idx);
-      loadingRef.current.delete(idx);
-      setPhotoCache((c) => ({ ...c, [idx]: full?.photoUrl ?? null }));
-    };
-    loadPhoto(currentIndex);
-    // Pre-fetch next slide
-    const nextIdx = (currentIndex + 1) % entries.length;
-    loadPhoto(nextIdx);
-  }, [currentIndex, entries, event, photoCache]);
-
-  // Build merged entry with cached photo for current slide
-  const getEntryWithPhoto = useCallback((entry: GuestEntry, idx: number): GuestEntry => {
-    const cachedPhoto = photoCache[idx];
-    return { ...entry, photoUrl: cachedPhoto !== undefined ? cachedPhoto : null };
-  }, [photoCache]);
 
   const pageTitle = `${cfg.title} — Live Slideshow`;
 
@@ -545,7 +513,7 @@ export default function SlideshowPage({ event }: Props) {
               {entries.map((entry, idx) => (
                 <Slide
                   key={entry.id}
-                  entry={getEntryWithPhoto(entry, idx)}
+                  entry={entry}
                   accentColor={cfg.accentColor}
                   secondaryColor={cfg.secondaryColor}
                   isVisible={idx === currentIndex}

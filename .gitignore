@@ -42,3 +42,6 @@ next-env.d.ts
 
 # Scripts with secrets
 scripts/set-vercel-env.js
+scripts/fix-env.js
+scripts/fix-vercel-db-url.js
+scripts/update-supabase-env.js
