@@ -1,9 +1,5 @@
-/**
- * GET /api/entries/photo/:id
- * Returns just the photo_url for a single entry (on-demand loading)
- */
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { supabase } from '@/lib/supabase';
+import { sql } from '@/lib/db-neon';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -13,16 +9,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const { id } = req.query as { id: string };
 
-  const { data, error } = await supabase
-    .from('guest_entries')
-    .select('photo_url')
-    .eq('id', id)
-    .single();
+  try {
+    const rows = await sql`SELECT photo_url FROM guest_entries WHERE id = ${id}`;
+    if (!rows.length) return res.status(404).json({ error: 'Not found' });
 
-  if (error) return res.status(500).json({ error: error.message });
-  if (!data)  return res.status(404).json({ error: 'Not found' });
-
-  // Cache for 1 hour
-  res.setHeader('Cache-Control', 'public, max-age=3600');
-  return res.status(200).json({ photoUrl: data.photo_url ?? null });
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    return res.status(200).json({ photoUrl: rows[0].photo_url ?? null });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : 'Database error';
+    return res.status(500).json({ error: msg });
+  }
 }
