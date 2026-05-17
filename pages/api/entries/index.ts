@@ -8,15 +8,17 @@ export const config = {
 
 function rowToEntry(row: Record<string, unknown>, includePhoto = true) {
   return {
-    id:        row.id,
-    name:      row.name,
-    phone:     row.phone,
-    message:   row.message,
-    photoUrl:  includePhoto ? (row.photo_url ?? null) : (row.photo_url ? '__has_photo__' : null),
-    event:     row.event,
-    status:    row.status,
-    showPhoto: row.show_photo,
-    timestamp: Number(row.timestamp),
+    id:                 row.id,
+    name:               row.name,
+    phone:              row.phone,
+    message:            row.message,
+    photoUrl:           includePhoto ? (row.photo_url ?? null) : (row.photo_url ? '__has_photo__' : null),
+    event:              row.event,
+    status:             row.status,
+    showPhoto:          row.show_photo,
+    timestamp:          Number(row.timestamp),
+    originalPhotoKB:    row.original_photo_kb   != null ? Number(row.original_photo_kb)   : null,
+    compressedPhotoKB:  row.compressed_photo_kb != null ? Number(row.compressed_photo_kb) : null,
   };
 }
 
@@ -31,21 +33,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       let rows;
       if (event && status) {
         rows = await sql`
-          SELECT id, name, phone, message, photo_url, event, status, show_photo, timestamp
+          SELECT id, name, phone, message, photo_url, event, status, show_photo, timestamp, original_photo_kb, compressed_photo_kb
           FROM guest_entries
           WHERE event = ${event as string} AND status = ${status as string}
           ORDER BY timestamp ASC
         `;
       } else if (event) {
         rows = await sql`
-          SELECT id, name, phone, message, photo_url, event, status, show_photo, timestamp
+          SELECT id, name, phone, message, photo_url, event, status, show_photo, timestamp, original_photo_kb, compressed_photo_kb
           FROM guest_entries
           WHERE event = ${event as string}
           ORDER BY timestamp DESC
         `;
       } else {
         rows = await sql`
-          SELECT id, name, phone, message, photo_url, event, status, show_photo, timestamp
+          SELECT id, name, phone, message, photo_url, event, status, show_photo, timestamp, original_photo_kb, compressed_photo_kb
           FROM guest_entries
           ORDER BY timestamp DESC
         `;
@@ -61,9 +63,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   // ── POST ───────────────────────────────────────────────────────────────────
   if (req.method === 'POST') {
-    const { name, message, photoUrl, event } = req.body as {
+    const { name, message, photoUrl, event, originalPhotoKB, compressedPhotoKB } = req.body as {
       name: string; message: string;
       photoUrl: string | null; event: EventType;
+      originalPhotoKB?: number | null; compressedPhotoKB?: number | null;
     };
 
     if (!name?.trim() || !message?.trim() || !event) {
@@ -74,8 +77,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     try {
       const rows = await sql`
-        INSERT INTO guest_entries (id, name, phone, message, photo_url, event, status, show_photo, timestamp)
-        VALUES (${id}, ${name.trim()}, '', ${message.trim()}, ${photoUrl ?? null}, ${event}, 'pending', true, ${Date.now()})
+        INSERT INTO guest_entries (id, name, phone, message, photo_url, event, status, show_photo, timestamp, original_photo_kb, compressed_photo_kb)
+        VALUES (${id}, ${name.trim()}, '', ${message.trim()}, ${photoUrl ?? null}, ${event}, 'pending', true, ${Date.now()}, ${originalPhotoKB ?? null}, ${compressedPhotoKB ?? null})
         RETURNING *
       `;
       return res.status(201).json(rowToEntry(rows[0] as Record<string, unknown>, true));

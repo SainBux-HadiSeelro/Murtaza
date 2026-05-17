@@ -6,9 +6,11 @@ export interface GuestEntry {
   name: string;
   phone: string;
   message: string;
-  photoUrl: string | null;   // base64 data URL stored in JSON
+  photoUrl: string | null;
   event: EventType;
   status: StatusType;
   showPhoto: boolean;
   timestamp: number;
+  originalPhotoKB:   number | null;
+  compressedPhotoKB: number | null;
 }

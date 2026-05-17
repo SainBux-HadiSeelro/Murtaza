@@ -15,6 +15,7 @@ export async function addGuestEntry(data: {
   message: string;
   photoFile: File | null;
   event: EventType;
+  photoSizeInfo?: { originalKB: number; compressedKB: number } | null;
 }): Promise<GuestEntry> {
   let photoUrl: string | null = null;
   if (data.photoFile) {
@@ -30,6 +31,8 @@ export async function addGuestEntry(data: {
       message: data.message,
       photoUrl,
       event: data.event,
+      originalPhotoKB:    data.photoSizeInfo?.originalKB    ?? null,
+      compressedPhotoKB:  data.photoSizeInfo?.compressedKB  ?? null,
     }),
   });
 

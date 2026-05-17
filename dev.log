@@ -7,3 +7,83 @@
  ○ Compiling /api/entries ...
  ✓ Compiled /api/entries in 694ms (71 modules)
  GET /api/entries?event=shadi 200 in 1425ms
+ ✓ Compiled in 366ms (54 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 4.4s (326 modules)
+ ✓ Compiled in 485ms (326 modules)
+ ⨯ Error: Cannot find module 'C:\Users\dell\Desktop\MURTAZA\.next\server\pages\_document.js'
+Require stack:
+- C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\server\require.js
+- C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\server\load-components.js
+- C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\build\utils.js
+- C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\server\dev\hot-middleware.js
+- C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\server\lib\router-server.js
+- C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\server\lib\start-server.js
+    at Function.<anonymous> (node:internal/modules/cjs/loader:1383:15)
+    at C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)
+    at Function._load (node:internal/modules/cjs/loader:1192:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1463:12)
+    at mod.require (C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:147:16)
+    at requirePage (C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\server\require.js:109:84)
+    at C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\server\load-components.js:72:65
+    at async Promise.all (index 0)
+    at async loadComponentsImpl (C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\server\load-components.js:71:33)
+    at async DevServer.findPageComponentsImpl (C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\server\next-server.js:710:36) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Users\\dell\\Desktop\\MURTAZA\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\Users\\dell\\Desktop\\MURTAZA\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\Users\\dell\\Desktop\\MURTAZA\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\Users\\dell\\Desktop\\MURTAZA\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'C:\\Users\\dell\\Desktop\\MURTAZA\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'C:\\Users\\dell\\Desktop\\MURTAZA\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\Users\\dell\\Desktop\\MURTAZA\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\Users\\dell\\Desktop\\MURTAZA\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ],
+  page: '/'
+}
+ ✓ Compiled /_error in 198ms (328 modules)
+ ⨯ Error: Cannot find module 'C:\Users\dell\Desktop\MURTAZA\.next\server\pages\_document.js'
+Require stack:
+- C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\server\require.js
+- C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\server\load-components.js
+- C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\build\utils.js
+- C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\server\dev\hot-middleware.js
+- C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\server\lib\router-server.js
+- C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\server\lib\start-server.js
+    at Function.<anonymous> (node:internal/modules/cjs/loader:1383:15)
+    at C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)
+    at Function._load (node:internal/modules/cjs/loader:1192:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1463:12)
+    at mod.require (C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:147:16)
+    at requirePage (C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\server\require.js:109:84)
+    at C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\server\load-components.js:72:65
+    at async Promise.all (index 0)
+    at async loadComponentsImpl (C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\server\load-components.js:71:33)
+    at async DevServer.findPageComponentsImpl (C:\Users\dell\Desktop\MURTAZA\node_modules\next\dist\server\next-server.js:710:36) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Users\\dell\\Desktop\\MURTAZA\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\Users\\dell\\Desktop\\MURTAZA\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\Users\\dell\\Desktop\\MURTAZA\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\Users\\dell\\Desktop\\MURTAZA\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'C:\\Users\\dell\\Desktop\\MURTAZA\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'C:\\Users\\dell\\Desktop\\MURTAZA\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\Users\\dell\\Desktop\\MURTAZA\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\Users\\dell\\Desktop\\MURTAZA\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ]
+}

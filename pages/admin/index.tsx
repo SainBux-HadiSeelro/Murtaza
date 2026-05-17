@@ -195,6 +195,13 @@ function EntryCard({ entry, onUpdate, onDelete }: {
               </div>
               <p className="text-gray-700 text-sm mt-1 line-clamp-2" dir="auto">{entry.message}</p>
               <p className="text-gray-400 text-xs mt-1">{date}</p>
+              {entry.originalPhotoKB != null && entry.compressedPhotoKB != null && (
+                <p className="text-xs mt-1">
+                  <span className="inline-flex items-center gap-1 bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded-full font-medium">
+                    📸 {entry.originalPhotoKB} KB → {entry.compressedPhotoKB} KB
+                  </span>
+                </p>
+              )}
             </div>
           </div>
 
