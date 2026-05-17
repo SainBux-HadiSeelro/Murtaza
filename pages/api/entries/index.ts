@@ -37,17 +37,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           FROM guest_entries
           WHERE event = ${event as string} AND status = ${status as string}
           ORDER BY timestamp ASC
+          LIMIT 100
         `;
       } else if (event) {
         rows = await sql`
-          SELECT id, name, phone, message, photo_url, event, status, show_photo, timestamp, original_photo_kb, compressed_photo_kb
+          SELECT id, name, phone, message,
+            CASE WHEN photo_url IS NOT NULL THEN '__has_photo__' ELSE NULL END as photo_url,
+            event, status, show_photo, timestamp, original_photo_kb, compressed_photo_kb
           FROM guest_entries
           WHERE event = ${event as string}
           ORDER BY timestamp DESC
         `;
       } else {
         rows = await sql`
-          SELECT id, name, phone, message, photo_url, event, status, show_photo, timestamp, original_photo_kb, compressed_photo_kb
+          SELECT id, name, phone, message,
+            CASE WHEN photo_url IS NOT NULL THEN '__has_photo__' ELSE NULL END as photo_url,
+            event, status, show_photo, timestamp, original_photo_kb, compressed_photo_kb
           FROM guest_entries
           ORDER BY timestamp DESC
         `;
