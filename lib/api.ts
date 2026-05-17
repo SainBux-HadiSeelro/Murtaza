@@ -50,11 +50,20 @@ export async function fetchEntries(event: EventType): Promise<GuestEntry[]> {
   return res.json();
 }
 
-// Slideshow — needs full photos
+// Slideshow — fetches metadata only (no base64 photos) to avoid 507 errors.
+// Photos are loaded one-at-a-time via fetchSlidePhoto().
 export async function fetchApprovedEntries(event: EventType): Promise<GuestEntry[]> {
-  const res = await fetch(`/api/entries?event=${event}&status=approved&full=1`);
+  const res = await fetch(`/api/entries?event=${event}&status=approved`);
   if (!res.ok) throw new Error('Failed to fetch entries');
   return res.json();
+}
+
+// Fetch a single approved entry WITH its photo by slide index (0-based).
+export async function fetchSlidePhoto(event: EventType, pageIndex: number): Promise<GuestEntry | null> {
+  const res = await fetch(`/api/entries?event=${event}&status=approved&full=1&page=${pageIndex}`);
+  if (!res.ok) return null;
+  const rows = await res.json();
+  return rows[0] ?? null;
 }
 
 // Fetch single photo on demand (admin preview)

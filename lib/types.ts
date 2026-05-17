@@ -1,4 +1,4 @@
-export type EventType = 'shadi';
+export type EventType = 'shadi' | 'walima';
 export type StatusType = 'pending' | 'approved' | 'rejected';
 
 export interface GuestEntry {

@@ -26,18 +26,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   // ── GET ────────────────────────────────────────────────────────────────────
   if (req.method === 'GET') {
-    const { event, status, full } = req.query;
+    const { event, status, full, page } = req.query;
     const includePhoto = full === '1';
+    // When fetching full photos (slideshow), fetch ONE entry at a time by page index
+    // to avoid Neon 507 "response too large" error from bulk base64 photo data.
+    const pageNum = page !== undefined ? Math.max(0, parseInt(page as string, 10) || 0) : -1;
 
     try {
       let rows;
-      if (event && status) {
+      if (event && status && includePhoto && pageNum >= 0) {
+        // Slideshow: paginated single-photo fetch — OFFSET/LIMIT 1 per slide
         rows = await sql`
           SELECT id, name, phone, message, photo_url, event, status, show_photo, timestamp, original_photo_kb, compressed_photo_kb
           FROM guest_entries
           WHERE event = ${event as string} AND status = ${status as string}
           ORDER BY timestamp ASC
-          LIMIT 100
+          LIMIT 1 OFFSET ${pageNum}
+        `;
+      } else if (event && status) {
+        // Slideshow initial list — no photo data, just metadata
+        rows = await sql`
+          SELECT id, name, phone, message,
+            CASE WHEN photo_url IS NOT NULL AND show_photo = true THEN '__has_photo__' ELSE NULL END as photo_url,
+            event, status, show_photo, timestamp, original_photo_kb, compressed_photo_kb
+          FROM guest_entries
+          WHERE event = ${event as string} AND status = ${status as string}
+          ORDER BY timestamp ASC
+          LIMIT 200
         `;
       } else if (event) {
         rows = await sql`
@@ -58,7 +73,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         `;
       }
 
-      return res.status(200).json(rows.map((r) => rowToEntry(r as Record<string, unknown>, includePhoto)));
+      return res.status(200).json(rows.map((r) => rowToEntry(r as Record<string, unknown>, includePhoto && pageNum >= 0)));
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : 'Database error';
       console.error('GET error:', msg);

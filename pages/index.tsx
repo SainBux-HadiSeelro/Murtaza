@@ -311,17 +311,6 @@ export default function Home() {
                         className="absolute top-2 right-2 bg-black/60 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm transition-colors"
                         aria-label="Remove photo">✕</button>
                     </div>
-                    {/* Size info */}
-                    {photoSizes && (
-                      <div className="mt-2 flex items-center gap-2 text-xs">
-                        <span className="text-white/40">Original: <span className="text-white/60">{photoSizes.original >= 1024 ? `${(photoSizes.original/1024).toFixed(1)} MB` : `${photoSizes.original} KB`}</span></span>
-                        <span className="text-white/30">→</span>
-                        <span className="text-green-400">Compressed: {photoSizes.compressed >= 1024 ? `${(photoSizes.compressed/1024).toFixed(1)} MB` : `${photoSizes.compressed} KB`}</span>
-                        <span className="text-green-400/60">
-                          ({Math.round((1 - photoSizes.compressed / photoSizes.original) * 100)}% smaller)
-                        </span>
-                      </div>
-                    )}
                   </div>
                 )}
 
