@@ -2,12 +2,16 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    dangerouslyAllowSVG: false,
-    remotePatterns: [],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        pathname: '/**',
+      },
+    ],
   },
   webpack: (config, { dev }) => {
     if (dev) {
-      // Disable filesystem cache in dev — prevents corrupt .pack.gz errors
       config.cache = false;
     }
     return config;

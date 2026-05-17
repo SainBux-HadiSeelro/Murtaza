@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { sql } from '@/lib/db-neon';
+import { uploadBase64Photo } from '@/lib/cloudinary';
 import type { EventType } from '@/lib/types';
 
 export const config = {
@@ -8,17 +9,19 @@ export const config = {
 
 function rowToEntry(row: Record<string, unknown>, includePhoto = true) {
   return {
-    id:                 row.id,
-    name:               row.name,
-    phone:              row.phone,
-    message:            row.message,
-    photoUrl:           includePhoto ? (row.photo_url ?? null) : (row.photo_url ? '__has_photo__' : null),
-    event:              row.event,
-    status:             row.status,
-    showPhoto:          row.show_photo,
-    timestamp:          Number(row.timestamp),
-    originalPhotoKB:    row.original_photo_kb   != null ? Number(row.original_photo_kb)   : null,
-    compressedPhotoKB:  row.compressed_photo_kb != null ? Number(row.compressed_photo_kb) : null,
+    id:                row.id,
+    name:              row.name,
+    phone:             row.phone,
+    message:           row.message,
+    photoUrl:          includePhoto
+      ? (row.photo_url ?? null)
+      : (row.photo_url ? '__has_photo__' : null),
+    event:             row.event,
+    status:            row.status,
+    showPhoto:         row.show_photo,
+    timestamp:         Number(row.timestamp),
+    originalPhotoKB:   row.original_photo_kb   != null ? Number(row.original_photo_kb)   : null,
+    compressedPhotoKB: row.compressed_photo_kb != null ? Number(row.compressed_photo_kb) : null,
   };
 }
 
@@ -26,38 +29,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   // ── GET ────────────────────────────────────────────────────────────────────
   if (req.method === 'GET') {
-    const { event, status, full, page } = req.query;
+    const { event, status, full } = req.query;
     const includePhoto = full === '1';
-    // When fetching full photos (slideshow), fetch ONE entry at a time by page index
-    // to avoid Neon 507 "response too large" error from bulk base64 photo data.
-    const pageNum = page !== undefined ? Math.max(0, parseInt(page as string, 10) || 0) : -1;
 
     try {
       let rows;
-      if (event && status && includePhoto && pageNum >= 0) {
-        // Slideshow: paginated single-photo fetch — OFFSET/LIMIT 1 per slide
+      if (event && status) {
+        // Slideshow: approved entries with photo URLs (URLs are tiny, not base64)
         rows = await sql`
-          SELECT id, name, phone, message, photo_url, event, status, show_photo, timestamp, original_photo_kb, compressed_photo_kb
+          SELECT id, name, phone, message, photo_url, event, status, show_photo,
+                 timestamp, original_photo_kb, compressed_photo_kb
           FROM guest_entries
           WHERE event = ${event as string} AND status = ${status as string}
           ORDER BY timestamp ASC
-          LIMIT 1 OFFSET ${pageNum}
-        `;
-      } else if (event && status) {
-        // Slideshow initial list — no photo data, just metadata
-        rows = await sql`
-          SELECT id, name, phone, message,
-            CASE WHEN photo_url IS NOT NULL AND show_photo = true THEN '__has_photo__' ELSE NULL END as photo_url,
-            event, status, show_photo, timestamp, original_photo_kb, compressed_photo_kb
-          FROM guest_entries
-          WHERE event = ${event as string} AND status = ${status as string}
-          ORDER BY timestamp ASC
-          LIMIT 200
+          LIMIT 100
         `;
       } else if (event) {
+        // Admin list: no photo data at all
         rows = await sql`
           SELECT id, name, phone, message,
-            CASE WHEN photo_url IS NOT NULL THEN '__has_photo__' ELSE NULL END as photo_url,
+            CASE WHEN photo_url IS NOT NULL THEN '__has_photo__' ELSE NULL END AS photo_url,
             event, status, show_photo, timestamp, original_photo_kb, compressed_photo_kb
           FROM guest_entries
           WHERE event = ${event as string}
@@ -66,14 +57,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       } else {
         rows = await sql`
           SELECT id, name, phone, message,
-            CASE WHEN photo_url IS NOT NULL THEN '__has_photo__' ELSE NULL END as photo_url,
+            CASE WHEN photo_url IS NOT NULL THEN '__has_photo__' ELSE NULL END AS photo_url,
             event, status, show_photo, timestamp, original_photo_kb, compressed_photo_kb
           FROM guest_entries
           ORDER BY timestamp DESC
         `;
       }
 
-      return res.status(200).json(rows.map((r) => rowToEntry(r as Record<string, unknown>, includePhoto && pageNum >= 0)));
+      return res.status(200).json(
+        rows.map((r) => rowToEntry(r as Record<string, unknown>, includePhoto))
+      );
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : 'Database error';
       console.error('GET error:', msg);
@@ -86,7 +79,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { name, message, photoUrl, event, originalPhotoKB, compressedPhotoKB } = req.body as {
       name: string; message: string;
       photoUrl: string | null; event: EventType;
-      originalPhotoKB?: number | null; compressedPhotoKB?: number | null;
+      originalPhotoKB?: number | null;
+      compressedPhotoKB?: number | null;
     };
 
     if (!name?.trim() || !message?.trim() || !event) {
@@ -95,10 +89,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 
+    // Upload photo to Cloudinary if provided (base64 → URL)
+    let finalPhotoUrl: string | null = null;
+    if (photoUrl && photoUrl.startsWith('data:')) {
+      try {
+        finalPhotoUrl = await uploadBase64Photo(photoUrl, id);
+      } catch (e) {
+        console.error('Cloudinary upload error:', e);
+        // Continue without photo rather than failing the whole submission
+        finalPhotoUrl = null;
+      }
+    } else if (photoUrl) {
+      finalPhotoUrl = photoUrl; // already a URL
+    }
+
     try {
       const rows = await sql`
-        INSERT INTO guest_entries (id, name, phone, message, photo_url, event, status, show_photo, timestamp, original_photo_kb, compressed_photo_kb)
-        VALUES (${id}, ${name.trim()}, '', ${message.trim()}, ${photoUrl ?? null}, ${event}, 'pending', true, ${Date.now()}, ${originalPhotoKB ?? null}, ${compressedPhotoKB ?? null})
+        INSERT INTO guest_entries
+          (id, name, phone, message, photo_url, event, status, show_photo,
+           timestamp, original_photo_kb, compressed_photo_kb)
+        VALUES
+          (${id}, ${name.trim()}, '', ${message.trim()}, ${finalPhotoUrl},
+           ${event}, 'pending', true, ${Date.now()},
+           ${originalPhotoKB ?? null}, ${compressedPhotoKB ?? null})
         RETURNING *
       `;
       return res.status(201).json(rowToEntry(rows[0] as Record<string, unknown>, true));
