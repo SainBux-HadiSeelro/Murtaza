@@ -6,3 +6,4 @@
  ✓ Ready in 4.4s
  ○ Compiling /api/entries ...
  ✓ Compiled /api/entries in 694ms (71 modules)
+ GET /api/entries?event=shadi 200 in 1425ms
