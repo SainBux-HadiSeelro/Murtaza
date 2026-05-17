@@ -389,3 +389,6 @@ GET error: Server error (HTTP status 402): {"message":"Your project has exceeded
  ○ Compiling /api/entries ...
  ✓ Compiled /api/entries in 708ms (73 modules)
  GET /api/entries?event=shadi 200 in 1295ms
+   Reload env: .env.local
+ ✓ Compiled in 3.3s (265 modules)
+ ✓ Compiled in 244ms (211 modules)
