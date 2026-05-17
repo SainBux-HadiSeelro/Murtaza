@@ -281,3 +281,5 @@ Each guest entry in Firestore (`guestEntries` collection):
 ---
 
 Made with ❤️ for a beautiful occasion. Mubarak ho! 🎊
+#   R e d e p l o y   t r i g g e r  
+ 
