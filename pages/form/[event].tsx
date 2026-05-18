@@ -9,7 +9,7 @@ interface Props { event: EventType; }
 
 type FormState = 'idle' | 'submitting' | 'success' | 'error';
 
-const EVENT_CONFIG = {
+const EVENT_CONFIG: Record<string, { title: string; emoji: string; btnGradient: string; btnHover: string }> = {
   shadi: {
     title: 'Murtaza & Family',
     emoji: '🌸',
