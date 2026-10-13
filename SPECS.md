@@ -3,7 +3,7 @@
 **Project Name:** Murtaza & Family Wedding Guestbook & Live Slideshow  
 **Version:** 1.0.0  
 **Stack:** Next.js 14 (Pages Router) · React 18 · TypeScript · Tailwind CSS · Supabase · Cloudinary  
-**Production Domain:** [https://sainbux.online](https://sainbux.online)
+**Production Domain:** [https://murtaza-snowy.vercel.app](https://murtaza-snowy.vercel.app)
 
 ---
 
@@ -220,7 +220,7 @@ On-demand fetch for entry photo URL (used by admin to preview photo without load
 | `CLOUDINARY_API_SECRET` | Server (Secret) | Cloudinary API Secret for authenticated uploads. |
 | `NEXT_PUBLIC_ADMIN_PASSWORD` | Client / Shared | Password required to access `/admin`. |
 | `NEXT_PUBLIC_SLIDESHOW_PASSWORD` | Client / Shared | Password required to open `/slideshow/*`. |
-| `NEXT_PUBLIC_APP_URL` | Client | Canonical URL used for QR code generation (e.g. `https://sainbux.online`). |
+| `NEXT_PUBLIC_APP_URL` | Client | Canonical URL used for QR code generation (e.g. `https://murtaza-snowy.vercel.app`). |
 
 ### 6.2 Security Best Practices
 - Supabase table access controlled with API-level validation.

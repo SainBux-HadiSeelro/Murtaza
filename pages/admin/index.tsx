@@ -46,7 +46,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
 // ─── QR Code Modal ────────────────────────────────────────────────────────────
 function QRModal({ event, onClose }: { event: EventType; onClose: () => void }) {
   const [qrDataUrl, setQrDataUrl] = useState('');
-  const url = 'https://sainbux.online';
+  const url = process.env.NEXT_PUBLIC_APP_URL || 'https://murtaza-snowy.vercel.app';
 
   useEffect(() => {
     QRCode.toDataURL(url, { width: 300, margin: 2, color: { dark: '#1a0a2e', light: '#fef3c7' } })

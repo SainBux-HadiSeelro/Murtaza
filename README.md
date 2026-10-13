@@ -3,7 +3,7 @@
 > **Murtaza & Family Wedding Guestbook & Slideshow Application**  
 > An interactive real-time digital guestbook for wedding events (Shadi & Walima) with instant photo uploads, admin moderation, and high-definition live venue slideshow displays.
 
-**Live URL:** [https://sainbux.online](https://sainbux.online)
+**Live URL:** [https://murtaza-snowy.vercel.app](https://murtaza-snowy.vercel.app)
 
 ---
 
@@ -168,7 +168,7 @@ Visit [http://localhost:3000](http://localhost:3000) in your browser.
 1. Go to `/admin` and log in with your admin password.
 2. Click **📱 QR Code** to view and download the high-resolution PNG.
 3. Print the QR codes on tabletop stands or banner posters.
-4. Guests point their smartphone cameras at the QR code and are instantly taken to `https://sainbux.online`.
+4. Guests point their smartphone cameras at the QR code and are instantly taken to `https://murtaza-snowy.vercel.app`.
 
 ### B. Organizer Moderation
 1. Keep `/admin` open on a laptop or tablet connected to Wi-Fi.
@@ -178,8 +178,8 @@ Visit [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### C. Venue Projection Screens / TVs
 1. Open the slideshow URL on the connected TV/projector laptop:
-   - For Shadi: `https://sainbux.online/slideshow/shadi`
-   - For Walima: `https://sainbux.online/slideshow/walima`
+   - For Shadi: `https://murtaza-snowy.vercel.app/slideshow/shadi`
+   - For Walima: `https://murtaza-snowy.vercel.app/slideshow/walima`
 2. Enter the slideshow access password.
 3. Press **F11** (Windows/Linux) or **Cmd + Ctrl + F** (Mac) to switch to borderless fullscreen.
 4. The slideshow will continuously cycle through all approved entries.
@@ -198,7 +198,8 @@ Visit [http://localhost:3000](http://localhost:3000) in your browser.
    - `CLOUDINARY_API_SECRET`
    - `NEXT_PUBLIC_ADMIN_PASSWORD`
    - `NEXT_PUBLIC_SLIDESHOW_PASSWORD`
-   - `NEXT_PUBLIC_APP_URL` (Set to `https://sainbux.online` or your custom domain)
+   - `NEXT_PUBLIC_APP_URL` (Set to `https://murtaza-snowy.vercel.app` or your custom domain)
+
 4. Deploy!
 
 ---
