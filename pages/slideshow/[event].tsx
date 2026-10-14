@@ -8,7 +8,6 @@ interface Props { event: EventType; }
 
 const SLIDE_DURATION = 5000;  // 5 seconds per slide
 const POLL_INTERVAL  = 15000; // 15s — less network calls = faster
-const SLIDESHOW_PASSWORD = process.env.NEXT_PUBLIC_SLIDESHOW_PASSWORD || 'murtazaslideshow12';
 
 const EVENT_CONFIG = {
   shadi: {
@@ -28,80 +27,6 @@ const EVENT_CONFIG = {
     bg: 'linear-gradient(160deg, #1a0000 0%, #3d0000 35%, #5c0000 65%, #2a0000 100%)',
   },
 };
-
-// ─── Slideshow Login Screen ───────────────────────────────────────────────────
-function SlideshowLogin({ onLogin }: { onLogin: () => void }) {
-  const [pw, setPw] = useState('');
-  const [error, setError] = useState('');
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (pw === SLIDESHOW_PASSWORD) {
-      sessionStorage.setItem('slideshow_auth', '1');
-      onLogin();
-    } else {
-      setError('Wrong password. Try again.');
-      setPw('');
-    }
-  };
-
-  return (
-    <div style={{
-      position: 'fixed', inset: 0,
-      background: 'radial-gradient(ellipse at top, #2d0a1e 0%, #1a0a2e 40%, #0d0d1a 100%)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem',
-    }}>
-      <div style={{
-        background: 'rgba(255,255,255,0.07)',
-        backdropFilter: 'blur(16px)',
-        border: '1px solid rgba(255,255,255,0.12)',
-        borderRadius: '1.25rem',
-        padding: '2.5rem',
-        width: '100%', maxWidth: '360px',
-        textAlign: 'center',
-      }}>
-        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📺</div>
-        <h1 style={{
-          fontFamily: 'Playfair Display, serif',
-          fontSize: '1.6rem', fontWeight: 700,
-          background: 'linear-gradient(90deg, #f59e0b, #fcd34d, #f59e0b)',
-          backgroundSize: '200% auto',
-          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
-          marginBottom: '1.5rem',
-        }}>Slideshow Access</h1>
-
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <input
-            type="password"
-            value={pw}
-            onChange={(e) => { setPw(e.target.value); setError(''); }}
-            placeholder="Enter password..."
-            autoFocus
-            style={{
-              width: '100%', padding: '0.75rem 1rem',
-              borderRadius: '0.75rem',
-              background: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              color: 'white', fontSize: '1rem',
-              outline: 'none',
-            }}
-          />
-          {error && <p style={{ color: '#f87171', fontSize: '0.85rem' }}>{error}</p>}
-          <button type="submit" style={{
-            padding: '0.85rem',
-            borderRadius: '0.75rem',
-            background: 'linear-gradient(135deg, #d97706, #f59e0b)',
-            color: 'white', fontWeight: 600, fontSize: '1rem',
-            border: 'none', cursor: 'pointer',
-          }}>
-            Enter Slideshow
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-}
 
 // ─── Ornament ─────────────────────────────────────────────────────────────────
 function Ornament({ color }: { color: string }) {
@@ -253,7 +178,6 @@ function WaitingScreen({ cfg }: { cfg: typeof EVENT_CONFIG['shadi'] }) {
 // ─── Main Slideshow ───────────────────────────────────────────────────────────
 export default function SlideshowPage({ event }: Props) {
   const cfg = EVENT_CONFIG[event];
-  const [authed, setAuthed]             = useState(false);
   const [mounted, setMounted]           = useState(false);
   const [entries, setEntries]           = useState<GuestEntry[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -264,10 +188,8 @@ export default function SlideshowPage({ event }: Props) {
   const slideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pollTimer  = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Auth check on mount
   useEffect(() => {
     setMounted(true);
-    if (sessionStorage.getItem('slideshow_auth') === '1') setAuthed(true);
   }, []);
 
   // ── Fetch approved entries ──────────────────────────────────────────────────
@@ -317,8 +239,6 @@ export default function SlideshowPage({ event }: Props) {
 
   // Show nothing until mounted (avoid SSR mismatch)
   if (!mounted) return null;
-  // Show login if not authenticated
-  if (!authed) return <SlideshowLogin onLogin={() => setAuthed(true)} />;
 
   return (
     <>
